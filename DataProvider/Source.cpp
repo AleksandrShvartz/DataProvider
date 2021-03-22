@@ -18,7 +18,7 @@ enum class  EPost {
 };
 
 
-//Вместо QDate
+//Instead QDate
 struct QDate {
 
 };
@@ -64,11 +64,11 @@ public:
 
 	void AddWorker(const Worker& worker) {
 		workers.push_back(worker);
-		//Нужно убирать из свободных людей, но это на уровне выше
+		//Need to remove from freeWorkers, but on the higher lvl
 	}
 
 	bool RemoveWorker(Worker& worker) {
-		//HACK: Написать отдельно функцию remove для вектора и вызывать ее здесь
+		//HACK: Maybe we should write special func remove for vector, because it can be used in many cases
 		auto it = find(workers.begin(), workers.end(), worker);
 
 		if (it != workers.end()) {
@@ -108,7 +108,7 @@ public:
 	}
 
 	bool RemoveWorker(Worker& worker) {
-		//HACK: Написать отдельно функцию remove для вектора и вызывать ее здесь
+		//HACK: Maybe we should write special func remove for vector, because it can be used in many cases
 		auto it = find(workers.begin(), workers.end(), worker);
 
 		if (it != workers.end()) {
@@ -131,14 +131,14 @@ protected:
 class DataFreeWorkers : FreeWorkers {
 public:
 	DataFreeWorkers(QDate date, EShiftNum shift) {
-		//HACK: заполняем массив workers на выбранную смену и дату из БД
+		//HACK: Fills mass workers on current shift and date from DB
 	}
 };
 
 
 class TestFreeWorkers : FreeWorkers {
 	TestFreeWorkers(QDate date, EShiftNum shift) {
-		//HACK: заполняем массив workers какими-то тестовыми значениями
+		//HACK: Fills mass workers by test values
 	}
 };
 
@@ -172,7 +172,7 @@ protected:
 	StorageSingleton(QDate date, EShiftNum shiftNum) : date(date), shiftNum(shiftNum) {
 
 	}
-	//Статические объекты сами освобождаются при завершении программы
+	//Static objects will be deleted automatically in the end of the programm
 	static StorageSingleton* pStorageSingleton_s;
 	size_t idEntered;
 	size_t idShiftLeader;
@@ -191,8 +191,7 @@ public:
 
 private:
 	TestStorageSingleton(QDate date, EShiftNum shiftNum) : StorageSingleton(date, shiftNum) {
-		//Заполняет поля idShiftLeader, freeWorkers, tapes тестовыми данными(с помощью 
-		//	их тестовых версий) 
+		//Fills idShiftLeader, freeWorkers, tapes with test values(with help of test class versions) 
 	}
 };
 
@@ -205,8 +204,7 @@ public:
 
 private:
 	DataStorageSingleton(QDate date, EShiftNum shiftNum) : StorageSingleton(date, shiftNum) {
-		//Заполняет поля idShiftLeader, freeWorkers, tapes данными с БД(с помощью 
-		//	их data версий)
+		//Fills idShiftLeader, freeWorkers, tapes with DB values(with help of test class versions)
 	}
 };
 
