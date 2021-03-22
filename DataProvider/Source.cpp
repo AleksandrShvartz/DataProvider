@@ -10,16 +10,19 @@ enum class  EShiftNum {
 	IV
 };
 
+
 enum class  EPost {
 	WORKER,
 	SHIFT_SUPERVISOR,
 	PRODUCTION_MANAGER
 };
 
+
 //Вместо QDate
 struct QDate {
 
 };
+
 
 class Worker
 {
@@ -51,6 +54,7 @@ private:
 	string fullName;
 	EPost post;
 };
+
 
 class ProdTape {
 public:
@@ -87,11 +91,15 @@ public:
 		return workers;
 	}
 
+	size_t CountWorkers() {
+
+	}
 private:
 	size_t id;
 	string name;
 	vector<Worker> workers;
 };
+
 
 class FreeWorkers {
 public:
@@ -111,9 +119,14 @@ public:
 		return false;
 	}
 
+	size_t CountWorkers() {
+
+	}
+
 protected:
 	vector<Worker> workers;
 };
+
 
 class DataFreeWorkers : FreeWorkers {
 public:
@@ -122,17 +135,19 @@ public:
 	}
 };
 
+
 class TestFreeWorkers : FreeWorkers {
 	TestFreeWorkers(QDate date, EShiftNum shift) {
-		//HACK: заполняем массив workers Какими тестовыми значениями
+		//HACK: заполняем массив workers какими-то тестовыми значениями
 	}
 };
 
-class Storage {
-public:
-	Storage(QDate date, EShiftNum shiftNum) : date(date), shiftNum(shiftNum){
 
-	}
+class StorageSingleton {
+public:
+	StorageSingleton(StorageSingleton& other) = delete;
+	void operator=(const StorageSingleton&) = delete;
+
 	FreeWorkers GetFreeWorkers() {
 
 	}
@@ -153,7 +168,12 @@ public:
 
 	}
 
-private:
+protected:
+	StorageSingleton(QDate date, EShiftNum shiftNum) : date(date), shiftNum(shiftNum) {
+
+	}
+	//Статические объекты сами освобождаются при завершении программы
+	static StorageSingleton* pStorageSingleton_s;
 	size_t idEntered;
 	size_t idShiftLeader;
 	static vector<ProdTape> tapes;
@@ -162,19 +182,52 @@ private:
 	EShiftNum shiftNum;
 };
 
-class TestStorage : Storage {
-	TestStorage(QDate date, EShiftNum shiftNum) : Storage(date, shiftNum) {
+
+class TestStorageSingleton : StorageSingleton {
+public:
+	TestStorageSingleton(TestStorageSingleton& other) = delete;
+	void operator=(const TestStorageSingleton&) = delete;
+	static StorageSingleton* GetInstance(QDate date, EShiftNum shiftNum);
+
+private:
+	TestStorageSingleton(QDate date, EShiftNum shiftNum) : StorageSingleton(date, shiftNum) {
 		//Заполняет поля idShiftLeader, freeWorkers, tapes тестовыми данными(с помощью 
 		//	их тестовых версий) 
 	}
 };
 
-class DataStorage : Storage {
-	DataStorage(QDate date, EShiftNum shiftNum) : Storage(date, shiftNum) {
+
+class DataStorageSingleton : StorageSingleton {
+public:
+	DataStorageSingleton(DataStorageSingleton& other) = delete;
+	void operator=(const DataStorageSingleton&) = delete;
+	static StorageSingleton* GetInstance(QDate date, EShiftNum shiftNum);
+
+private:
+	DataStorageSingleton(QDate date, EShiftNum shiftNum) : StorageSingleton(date, shiftNum) {
 		//Заполняет поля idShiftLeader, freeWorkers, tapes данными с БД(с помощью 
 		//	их data версий)
 	}
 };
+
+
+StorageSingleton* StorageSingleton::pStorageSingleton_s = nullptr;
+
+StorageSingleton* TestStorageSingleton::GetInstance(QDate date, EShiftNum shiftNum)
+{
+	if (pStorageSingleton_s == nullptr) {
+		pStorageSingleton_s = new TestStorageSingleton(date, shiftNum);
+	}
+	return pStorageSingleton_s;
+}
+
+StorageSingleton* DataStorageSingleton::GetInstance(QDate date, EShiftNum shiftNum)
+{
+	if (pStorageSingleton_s == nullptr) {
+		pStorageSingleton_s = new DataStorageSingleton(date, shiftNum);
+	}
+	return pStorageSingleton_s;
+}
 
 int main(void) {
 
