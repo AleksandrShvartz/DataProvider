@@ -201,15 +201,11 @@ public:
 	void operator=(const TestStorageSingleton&) = delete;
 	static StorageSingleton* GetInstance();
 	
-	vector<Employee> GetFreeWorkers() {
+	vector<Employee> GetFreeWorkers(QDate date, EShiftNum shiftNum) {
 
 	}
 
 	Shift GetShift(QDate date, EShiftNum shiftNum) {
-
-	}
-
-	const ProdTape GetTape(size_t id) {
 
 	}
 private:
@@ -229,10 +225,6 @@ public:
 	}
 
 	Shift GetShift(QDate date, EShiftNum shiftNum) {
-
-	}
-
-	const ProdTape GetTape(size_t id) {
 
 	}
 private:
