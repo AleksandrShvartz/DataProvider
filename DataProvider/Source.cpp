@@ -147,13 +147,21 @@ private:
 //	}
 //};
 
-
-class StorageSingleton {
+class Shift {
 public:
-	StorageSingleton(StorageSingleton& other) = delete;
-	void operator=(const StorageSingleton&) = delete;
+	Shift(QDate date, EShiftNum shiftNum) : date(date), shiftNum(shiftNum) {
 
-	vector<Employee> GetFreeWorkers() {
+	}
+	
+	void SetTapes(vector<ProdTape> newTapes) {
+
+	}
+
+	void SetTape(ProdTape newTape) {
+
+	}
+
+	void AddTape() {
 
 	}
 
@@ -165,27 +173,25 @@ public:
 
 	}
 
-	void SetTapes(vector<ProdTape> newTapes) {
+private:
+	size_t idShiftLeader;
+	vector<ProdTape> tapes;
+	QDate date;
+	EShiftNum shiftNum;
+};
 
-	}
+class StorageSingleton {
+public:
+	StorageSingleton(StorageSingleton& other) = delete;
+	void operator=(const StorageSingleton&) = delete;
 
-	void SetTape(ProdTape newTape) {
-
-	}
 
 protected:
-	StorageSingleton(QDate date, EShiftNum shiftNum) : date(date), shiftNum(shiftNum) {
+	StorageSingleton() {
 
 	}
 	//Static objects will be deleted automatically in the end of the programm
 	static StorageSingleton* pStorageSingleton_s;
-	size_t idEntered;
-	size_t idShiftLeader;
-	static vector<ProdTape> tapes;
-	static vector<Employee> allPeople;
-	//FreeWorkers freeWorkers;
-	QDate date;
-	EShiftNum shiftNum;
 };
 
 
@@ -193,11 +199,21 @@ class TestStorageSingleton : StorageSingleton {
 public:
 	TestStorageSingleton(TestStorageSingleton& other) = delete;
 	void operator=(const TestStorageSingleton&) = delete;
-	static StorageSingleton* GetInstance(QDate date, EShiftNum shiftNum);
+	static StorageSingleton* GetInstance();
+	
+	vector<Employee> GetFreeWorkers() {
 
+	}
+
+	Shift GetShift(QDate date, EShiftNum shiftNum) {
+
+	}
+
+	const ProdTape GetTape(size_t id) {
+
+	}
 private:
-	TestStorageSingleton(QDate date, EShiftNum shiftNum) : StorageSingleton(date, shiftNum) {
-		//Fills idShiftLeader, freeWorkers, tapes with test values(with help of test class versions) 
+	TestStorageSingleton() : StorageSingleton(){
 	}
 };
 
@@ -206,29 +222,39 @@ class DataStorageSingleton : StorageSingleton {
 public:
 	DataStorageSingleton(DataStorageSingleton& other) = delete;
 	void operator=(const DataStorageSingleton&) = delete;
-	static StorageSingleton* GetInstance(QDate date, EShiftNum shiftNum);
+	static StorageSingleton* GetInstance();
+	
+	vector<Employee> GetFreeWorkers() {
 
+	}
+
+	Shift GetShift(QDate date, EShiftNum shiftNum) {
+
+	}
+
+	const ProdTape GetTape(size_t id) {
+
+	}
 private:
-	DataStorageSingleton(QDate date, EShiftNum shiftNum) : StorageSingleton(date, shiftNum) {
-		//Fills idShiftLeader, freeWorkers, tapes with DB values(with help of test class versions)
+	DataStorageSingleton() : StorageSingleton() {
 	}
 };
 
 
 StorageSingleton* StorageSingleton::pStorageSingleton_s = nullptr;
 
-StorageSingleton* TestStorageSingleton::GetInstance(QDate date, EShiftNum shiftNum)
+StorageSingleton* TestStorageSingleton::GetInstance()
 {
 	if (pStorageSingleton_s == nullptr) {
-		pStorageSingleton_s = new TestStorageSingleton(date, shiftNum);
+		pStorageSingleton_s = new TestStorageSingleton();
 	}
 	return pStorageSingleton_s;
 }
 
-StorageSingleton* DataStorageSingleton::GetInstance(QDate date, EShiftNum shiftNum)
+StorageSingleton* DataStorageSingleton::GetInstance()
 {
 	if (pStorageSingleton_s == nullptr) {
-		pStorageSingleton_s = new DataStorageSingleton(date, shiftNum);
+		pStorageSingleton_s = new DataStorageSingleton();
 	}
 	return pStorageSingleton_s;
 }
