@@ -17,6 +17,11 @@ enum class  EPost {
 	PRODUCTION_MANAGER
 };
 
+enum class  EStatus {
+	ONPLACE,
+	NOTONPLACE, 
+	FREE
+};
 
 //Instead QDate
 struct QDate {
@@ -67,7 +72,7 @@ public:
 		//Need to remove from freeWorkers, but on the higher lvl
 	}
 
-	bool RemoveWorker(Worker& worker) {
+	bool RemoveWorker(Employee& worker) {
 		//HACK: Maybe we should write special func remove for vector, because it can be used in many cases
 		auto it = find(workers.begin(), workers.end(), worker);
 
@@ -101,46 +106,46 @@ private:
 };
 
 
-class FreeWorkers {
-public:
-	void Add(Employee worker) {
-		workers.push_back(worker);
-	}
-
-	bool RemoveWorker(Worker& worker) {
-		//HACK: Maybe we should write special func remove for vector, because it can be used in many cases
-		auto it = find(workers.begin(), workers.end(), worker);
-
-		if (it != workers.end()) {
-			workers.erase(it);
-			return true;
-		}
-
-		return false;
-	}
-
-	size_t CountWorkers() {
-
-	}
-
-protected:
-	vector<Employee> workers;
-};
-
-
-class DataFreeWorkers : FreeWorkers {
-public:
-	DataFreeWorkers(QDate date, EShiftNum shift) {
-		//HACK: Fills mass workers on current shift and date from DB
-	}
-};
-
-
-class TestFreeWorkers : FreeWorkers {
-	TestFreeWorkers(QDate date, EShiftNum shift) {
-		//HACK: Fills mass workers by test values
-	}
-};
+//class FreeWorkers {
+//public:
+//	void Add(Employee worker) {
+//		workers.push_back(worker);
+//	}
+//
+//	bool RemoveWorker(Employee& worker) {
+//		//HACK: Maybe we should write special func remove for vector, because it can be used in many cases
+//		auto it = find(workers.begin(), workers.end(), worker);
+//
+//		if (it != workers.end()) {
+//			workers.erase(it);
+//			return true;
+//		}
+//
+//		return false;
+//	}
+//
+//	size_t CountWorkers() {
+//
+//	}
+//
+//protected:
+//	vector<Employee> workers;
+//};
+//
+//
+//class DataFreeWorkers : FreeWorkers {
+//public:
+//	DataFreeWorkers(QDate date, EShiftNum shift) {
+//		//HACK: Fills mass workers on current shift and date from DB
+//	}
+//};
+//
+//
+//class TestFreeWorkers : FreeWorkers {
+//	TestFreeWorkers(QDate date, EShiftNum shift) {
+//		//HACK: Fills mass workers by test values
+//	}
+//};
 
 
 class StorageSingleton {
@@ -148,7 +153,7 @@ public:
 	StorageSingleton(StorageSingleton& other) = delete;
 	void operator=(const StorageSingleton&) = delete;
 
-	FreeWorkers GetFreeWorkers() {
+	vector<Employee> GetFreeWorkers() {
 
 	}
 
@@ -177,7 +182,8 @@ protected:
 	size_t idEntered;
 	size_t idShiftLeader;
 	static vector<ProdTape> tapes;
-	FreeWorkers freeWorkers;
+	static vector<Employee> allPeople;
+	//FreeWorkers freeWorkers;
 	QDate date;
 	EShiftNum shiftNum;
 };
