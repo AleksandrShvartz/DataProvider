@@ -185,7 +185,13 @@ public:
 	StorageSingleton(StorageSingleton& other) = delete;
 	void operator=(const StorageSingleton&) = delete;
 
+	virtual vector<Employee> GetFreeWorkers(QDate date, EShiftNum shiftNum) = 0;
 
+	virtual Shift GetShift(QDate date, EShiftNum shiftNum) = 0;
+
+	static StorageSingleton* GetInstance() {
+		return pStorageSingleton_s;
+	}
 protected:
 	StorageSingleton() {
 
@@ -194,20 +200,25 @@ protected:
 	static StorageSingleton* pStorageSingleton_s;
 };
 
+StorageSingleton* StorageSingleton::pStorageSingleton_s = nullptr;
+
 
 class TestStorageSingleton : StorageSingleton {
 public:
 	TestStorageSingleton(TestStorageSingleton& other) = delete;
 	void operator=(const TestStorageSingleton&) = delete;
-	static StorageSingleton* GetInstance();
+	static void Init();
 	
 	vector<Employee> GetFreeWorkers(QDate date, EShiftNum shiftNum) {
-
+		vector<Employee> freeWorkers;
+		return freeWorkers;
 	}
 
 	Shift GetShift(QDate date, EShiftNum shiftNum) {
-
+		Shift shift(date, shiftNum);
+		return shift;
 	}
+
 private:
 	TestStorageSingleton() : StorageSingleton(){
 	}
@@ -218,14 +229,16 @@ class DataStorageSingleton : StorageSingleton {
 public:
 	DataStorageSingleton(DataStorageSingleton& other) = delete;
 	void operator=(const DataStorageSingleton&) = delete;
-	static StorageSingleton* GetInstance();
+	static void Init();
 	
-	vector<Employee> GetFreeWorkers() {
-
+	vector<Employee> GetFreeWorkers(QDate date, EShiftNum shiftNum) {
+		vector<Employee> freeWorkers;
+		return freeWorkers;
 	}
 
 	Shift GetShift(QDate date, EShiftNum shiftNum) {
-
+		Shift shift(date, shiftNum);
+		return shift;
 	}
 private:
 	DataStorageSingleton() : StorageSingleton() {
@@ -233,25 +246,26 @@ private:
 };
 
 
-StorageSingleton* StorageSingleton::pStorageSingleton_s = nullptr;
 
-StorageSingleton* TestStorageSingleton::GetInstance()
-{
+void TestStorageSingleton::Init() {
 	if (pStorageSingleton_s == nullptr) {
 		pStorageSingleton_s = new TestStorageSingleton();
 	}
-	return pStorageSingleton_s;
+	//return pStorageSingleton_s;
 }
 
-StorageSingleton* DataStorageSingleton::GetInstance()
-{
+void DataStorageSingleton::Init() {
 	if (pStorageSingleton_s == nullptr) {
 		pStorageSingleton_s = new DataStorageSingleton();
 	}
-	return pStorageSingleton_s;
+	//return pStorageSingleton_s;
 }
 
 int main(void) {
-
+	TestStorageSingleton::Init();
+	////DataStorageSingleton::Init();
+	QDate date;
+	StorageSingleton::GetInstance()->GetShift(date, EShiftNum::I);
+	delete StorageSingleton::GetInstance();
 	return 0;
 }
