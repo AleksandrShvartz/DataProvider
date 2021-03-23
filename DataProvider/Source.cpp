@@ -16,19 +16,24 @@ enum class  EPost {
 	PRODUCTION_MANAGER
 };
 
+enum class  EStatus {
+	ONPLACE,
+	NOTONPLACE
+};
+
 //Вместо QDate
 struct QDate {
 
 };
 
-class Worker
+class Employee
 {
 public:
-	Worker(size_t id, string fullName, EPost post) : id(id), fullName(fullName), post(post) {
+	Employee(size_t id, string fullName, EPost post) : id(id), fullName(fullName), post(post) {
 
 	}
 
-	bool operator==(const Worker& wComp) {
+	bool operator==(const Employee& wComp) {
 		if (wComp.id == id && wComp.fullName == fullName && wComp.post == post)
 			return true;
 		return false;
@@ -50,6 +55,7 @@ private:
 	size_t id;
 	string fullName;
 	EPost post;
+	EStatus status;
 };
 
 class ProdTape {
@@ -58,12 +64,12 @@ public:
 
 	}
 
-	void AddWorker(const Worker& worker) {
+	void AddWorker(const Employee& worker) {
 		workers.push_back(worker);
 		//Нужно убирать из свободных людей, но это на уровне выше
 	}
 
-	bool RemoveWorker(Worker& worker) {
+	bool RemoveWorker(Employee& worker) {
 		//HACK: Написать отдельно функцию remove для вектора и вызывать ее здесь
 		auto it = find(workers.begin(), workers.end(), worker);
 
@@ -83,23 +89,23 @@ public:
 		return name;
 	}
 
-	const vector<Worker>& GetWorkers() {
+	const vector<Employee>& GetWorkers() {
 		return workers;
 	}
 
 private:
 	size_t id;
 	string name;
-	vector<Worker> workers;
+	vector<Employee> workers;
 };
 
 class FreeWorkers {
 public:
-	void Add(Worker worker) {
+	void Add(Employee worker) {
 		workers.push_back(worker);
 	}
 
-	bool RemoveWorker(Worker& worker) {
+	bool RemoveWorker(Employee& worker) {
 		//HACK: Написать отдельно функцию remove для вектора и вызывать ее здесь
 		auto it = find(workers.begin(), workers.end(), worker);
 
@@ -112,7 +118,7 @@ public:
 	}
 
 protected:
-	vector<Worker> workers;
+	vector<Employee> workers;
 };
 
 class DataFreeWorkers : FreeWorkers {
@@ -154,8 +160,8 @@ public:
 	}
 
 private:
-	size_t idEntered;
-	size_t idShiftLeader;
+	Employee entered;
+	Employee shiftLeader;
 	static vector<ProdTape> tapes;
 	FreeWorkers freeWorkers;
 	QDate date;
@@ -163,14 +169,14 @@ private:
 };
 
 class TestStorage : Storage {
-	TestStorage(QDate date, EShiftNum shiftNum) : Storage(date, shiftNum) {
+	TestStorage(QDate date, EShiftNum shiftNum, size_t idEntered) : Storage(date, shiftNum) {
 		//Заполняет поля idShiftLeader, freeWorkers, tapes тестовыми данными(с помощью 
 		//	их тестовых версий) 
 	}
 };
 
 class DataStorage : Storage {
-	DataStorage(QDate date, EShiftNum shiftNum) : Storage(date, shiftNum) {
+	DataStorage(QDate date, EShiftNum shiftNum, size_t idEntered) : Storage(date, shiftNum) {
 		//Заполняет поля idShiftLeader, freeWorkers, tapes данными с БД(с помощью 
 		//	их data версий)
 	}
