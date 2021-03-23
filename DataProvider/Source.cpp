@@ -10,18 +10,15 @@ enum class  EShiftNum {
 	IV
 };
 
+
 enum class  EPost {
 	WORKER,
 	SHIFT_SUPERVISOR,
 	PRODUCTION_MANAGER
 };
 
-enum class  EStatus {
-	ONPLACE,
-	NOTONPLACE
-};
 
-//Вместо QDate
+//Instead QDate
 struct QDate {
 
 };
@@ -58,6 +55,7 @@ private:
 	EStatus status;
 };
 
+
 class ProdTape {
 public:
 	ProdTape(size_t id, string name) : id(id), name(name) {
@@ -66,11 +64,11 @@ public:
 
 	void AddWorker(const Employee& worker) {
 		workers.push_back(worker);
-		//Нужно убирать из свободных людей, но это на уровне выше
+		//Need to remove from freeWorkers, but on the higher lvl
 	}
 
-	bool RemoveWorker(Employee& worker) {
-		//HACK: Написать отдельно функцию remove для вектора и вызывать ее здесь
+	bool RemoveWorker(Worker& worker) {
+		//HACK: Maybe we should write special func remove for vector, because it can be used in many cases
 		auto it = find(workers.begin(), workers.end(), worker);
 
 		if (it != workers.end()) {
@@ -93,11 +91,15 @@ public:
 		return workers;
 	}
 
+	size_t CountWorkers() {
+
+	}
 private:
 	size_t id;
 	string name;
 	vector<Employee> workers;
 };
+
 
 class FreeWorkers {
 public:
@@ -105,8 +107,8 @@ public:
 		workers.push_back(worker);
 	}
 
-	bool RemoveWorker(Employee& worker) {
-		//HACK: Написать отдельно функцию remove для вектора и вызывать ее здесь
+	bool RemoveWorker(Worker& worker) {
+		//HACK: Maybe we should write special func remove for vector, because it can be used in many cases
 		auto it = find(workers.begin(), workers.end(), worker);
 
 		if (it != workers.end()) {
@@ -117,28 +119,35 @@ public:
 		return false;
 	}
 
+	size_t CountWorkers() {
+
+	}
+
 protected:
 	vector<Employee> workers;
 };
 
+
 class DataFreeWorkers : FreeWorkers {
 public:
 	DataFreeWorkers(QDate date, EShiftNum shift) {
-		//HACK: заполняем массив workers на выбранную смену и дату из БД
+		//HACK: Fills mass workers on current shift and date from DB
 	}
 };
+
 
 class TestFreeWorkers : FreeWorkers {
 	TestFreeWorkers(QDate date, EShiftNum shift) {
-		//HACK: заполняем массив workers Какими тестовыми значениями
+		//HACK: Fills mass workers by test values
 	}
 };
 
-class Storage {
-public:
-	Storage(QDate date, EShiftNum shiftNum) : date(date), shiftNum(shiftNum){
 
-	}
+class StorageSingleton {
+public:
+	StorageSingleton(StorageSingleton& other) = delete;
+	void operator=(const StorageSingleton&) = delete;
+
 	FreeWorkers GetFreeWorkers() {
 
 	}
@@ -159,28 +168,64 @@ public:
 
 	}
 
-private:
-	Employee entered;
-	Employee shiftLeader;
+protected:
+	StorageSingleton(QDate date, EShiftNum shiftNum) : date(date), shiftNum(shiftNum) {
+
+	}
+	//Static objects will be deleted automatically in the end of the programm
+	static StorageSingleton* pStorageSingleton_s;
+	size_t idEntered;
+	size_t idShiftLeader;
 	static vector<ProdTape> tapes;
 	FreeWorkers freeWorkers;
 	QDate date;
 	EShiftNum shiftNum;
 };
 
-class TestStorage : Storage {
-	TestStorage(QDate date, EShiftNum shiftNum, size_t idEntered) : Storage(date, shiftNum) {
-		//Заполняет поля idShiftLeader, freeWorkers, tapes тестовыми данными(с помощью 
-		//	их тестовых версий) 
+
+class TestStorageSingleton : StorageSingleton {
+public:
+	TestStorageSingleton(TestStorageSingleton& other) = delete;
+	void operator=(const TestStorageSingleton&) = delete;
+	static StorageSingleton* GetInstance(QDate date, EShiftNum shiftNum);
+
+private:
+	TestStorageSingleton(QDate date, EShiftNum shiftNum) : StorageSingleton(date, shiftNum) {
+		//Fills idShiftLeader, freeWorkers, tapes with test values(with help of test class versions) 
 	}
 };
 
-class DataStorage : Storage {
-	DataStorage(QDate date, EShiftNum shiftNum, size_t idEntered) : Storage(date, shiftNum) {
-		//Заполняет поля idShiftLeader, freeWorkers, tapes данными с БД(с помощью 
-		//	их data версий)
+
+class DataStorageSingleton : StorageSingleton {
+public:
+	DataStorageSingleton(DataStorageSingleton& other) = delete;
+	void operator=(const DataStorageSingleton&) = delete;
+	static StorageSingleton* GetInstance(QDate date, EShiftNum shiftNum);
+
+private:
+	DataStorageSingleton(QDate date, EShiftNum shiftNum) : StorageSingleton(date, shiftNum) {
+		//Fills idShiftLeader, freeWorkers, tapes with DB values(with help of test class versions)
 	}
 };
+
+
+StorageSingleton* StorageSingleton::pStorageSingleton_s = nullptr;
+
+StorageSingleton* TestStorageSingleton::GetInstance(QDate date, EShiftNum shiftNum)
+{
+	if (pStorageSingleton_s == nullptr) {
+		pStorageSingleton_s = new TestStorageSingleton(date, shiftNum);
+	}
+	return pStorageSingleton_s;
+}
+
+StorageSingleton* DataStorageSingleton::GetInstance(QDate date, EShiftNum shiftNum)
+{
+	if (pStorageSingleton_s == nullptr) {
+		pStorageSingleton_s = new DataStorageSingleton(date, shiftNum);
+	}
+	return pStorageSingleton_s;
+}
 
 int main(void) {
 
